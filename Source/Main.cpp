@@ -1,6 +1,7 @@
-#include "Core.hpp"
+#include "Assert/Assert.hpp"
+#include "Assert/Context.hpp"
 
-auto main(int /*argc*/, char** /*argv*/) -> int {
-  using Csc::Greeter;
-  Greeter().SayHi();
+auto main() -> int {
+  ASSERT(2 == 3);
+  Assert::GetContext().DisplayInfo();
 }
