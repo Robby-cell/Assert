@@ -1,11 +1,14 @@
 #ifndef ASSERT_HPP_
 #define ASSERT_HPP_
 
-#include "Context.hpp"
+#include "Assert/Context.hpp"
+#include "Context.hpp" // IWYU pragma: keep
 
+#include <algorithm>
 #include <iostream>
 #include <sstream>
 #include <stdexcept>
+#include <string>
 
 namespace Assert {
 
@@ -331,9 +334,14 @@ private:
       ::Assert::ExprValidate(_Test);                                           \
       ::Assert::GetContext().AddPass(ss.str());                                \
     } catch (::Assert::AssertionFailure const& e) {                            \
-      std::cerr << __FILE__ << " at line " << __LINE__ << " in function "      \
-                << __PRETTY_FUNCTION__ << ":\n"                                \
-                << e.what() << '\n';                                           \
+      auto _Section = ::Assert::GetContext().CurrentSection();                 \
+      std::cerr << __BASE_FILE__;                                              \
+      if (_Section.length()) {                                                 \
+        std::cerr << " in section " << _Section;                               \
+      }                                                                        \
+      std::cerr << " in function " << __PRETTY_FUNCTION__ << ":\n"             \
+                << "\t---> Line " << __LINE__ << ": " #__VA_ARGS__ << '\n'     \
+                << '\t' << e.what() << '\n';                                   \
       ::Assert::GetContext().AddFail(ss.str());                                \
     }                                                                          \
   } while (false)
@@ -341,6 +349,22 @@ private:
 #define PRECONDITION(...) ASSERT(__VA_ARGS__)
 #define POST_CONDITION(...) ASSERT(__VA_ARGS__)
 #define REQUIRE(...) ASSERT(__VA_ARGS__)
+
+struct Section {
+public:
+  explicit Section(std::string section) : section_(std::move(section)) {}
+  template <typename Func> friend auto operator|(const Section& scope, Func f) {
+    GetContext().EnterSection(scope.section_);
+    f();
+    GetContext().PopSection();
+  }
+
+private:
+  std::string section_;
+};
+
+#define SECTION(SECTION_NAME) ::Assert::Section{SECTION_NAME} | [&]()
+
 } // namespace Assert
 
 #endif // ASSERT_HPP_
