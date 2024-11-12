@@ -1,5 +1,6 @@
 #include "Assert/Context.hpp"
 
+#include <cstddef>
 #include <iostream>
 #include <sstream>
 #include <string>
@@ -7,11 +8,43 @@
 namespace Assert {
 
 auto Context::DisplayInfo() const -> void {
-  if (failed_.empty()) {
-    std::cout << "All " << passed_.size() << " tests passed\n";
+  std::size_t test_pass = 0;
+  std::size_t passed = 0;
+  std::size_t failed = 0;
+
+  for (std::size_t i = 0; i < tests_.size(); ++i) {
+    const auto& test = tests_.at(i);
+    if (!test.Failed()) {
+      ++test_pass;
+    }
+    passed += test.Passed();
+    failed += test.Failed();
+
+    if (test.Failed()) {
+      std::cerr << "\tTest case " << i << ":\n\t\t" << test.Passed()
+                << " passed\n\t\t" << test.Failed() << " failed\n";
+    }
+  }
+
+  if (test_pass == tests_.size()) {
+    std::cerr << "All " << tests_.size() << " tests passed\n\t" << passed
+              << " Assertions\n";
+
   } else {
-    std::cout << passed_.size() << " tests passed\n"
-              << failed_.size() << " tests failed\n";
+    auto test_fail = tests_.size() - test_pass;
+    std::cerr << "Passed " << test_pass << " tests and failed " << test_fail
+              << '\n';
+  }
+
+  std::cerr << '\n';
+
+  if (global_assertions_.Failed()) {
+    std::cerr << "Global assertions (" << global_assertions_.TestCount()
+              << "):\n\t" << global_assertions_.Passed() << " passed\n\t"
+              << global_assertions_.Failed() << " failed\n";
+  } else if (global_assertions_.Passed()) {
+    std::cerr << "All " << global_assertions_.Passed()
+              << " global assertions passed\n";
   }
 }
 

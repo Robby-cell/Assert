@@ -1,10 +1,9 @@
-#ifndef ASSERT_HPP_
-#define ASSERT_HPP_
+#ifndef ASSERT_ASSERT_ASSERT_HPP_
+#define ASSERT_ASSERT_ASSERT_HPP_
 
 #include "Assert/Context.hpp"
-#include "Context.hpp" // IWYU pragma: keep
+#include "Context.hpp" // IWYU pragma: export
 
-#include <algorithm>
 #include <iostream>
 #include <sstream>
 #include <stdexcept>
@@ -332,7 +331,7 @@ private:
     ss << _Test;                                                               \
     try {                                                                      \
       ::Assert::ExprValidate(_Test);                                           \
-      ::Assert::GetContext().AddPass(ss.str());                                \
+      ::Assert::GetContext().AddPass();                                        \
     } catch (::Assert::AssertionFailure const& e) {                            \
       auto _Section = ::Assert::GetContext().CurrentSection();                 \
       std::cerr << __BASE_FILE__;                                              \
@@ -342,7 +341,7 @@ private:
       std::cerr << " in function " << __PRETTY_FUNCTION__ << ":\n"             \
                 << "\t---> Line " << __LINE__ << ": " #__VA_ARGS__ << '\n'     \
                 << '\t' << e.what() << '\n';                                   \
-      ::Assert::GetContext().AddFail(ss.str());                                \
+      ::Assert::GetContext().AddFail();                                        \
     }                                                                          \
   } while (false)
 
@@ -352,11 +351,13 @@ private:
 
 struct Section {
 public:
-  explicit Section(std::string section) : section_(std::move(section)) {}
+  explicit Section(std::string section) noexcept {
+    GetContext().EnterSection(std::move(section));
+  }
+  ~Section() { GetContext().PopSection(); }
   template <typename Func> friend auto operator|(const Section& scope, Func f) {
-    GetContext().EnterSection(scope.section_);
+    (void)scope;
     f();
-    GetContext().PopSection();
   }
 
 private:
@@ -365,6 +366,22 @@ private:
 
 #define SECTION(SECTION_NAME) ::Assert::Section{SECTION_NAME} | [&]()
 
+struct Nothing {
+  constexpr Nothing() = default;
+};
+
+#define CAT0(FIRST, SECOND) FIRST%:%:SECOND
+#define CAT(FIRST, SECOND) CAT0(FIRST, SECOND)
+#define ASSERT_UNIQUE_TEST_NAME(TEST_NAME) CAT(TEST_NAME, __LINE__)
+#define TEST_CAST(NAME)                                                        \
+  static void ASSERT_UNIQUE_TEST_NAME(INTERNAL_TEST_CASE_)();                  \
+  static auto CAT(VAR, ASSERT_UNIQUE_TEST_NAME(INTERNAL_TEST_CASE_)) = []() {  \
+    ::Assert::GetContext().AddTest();                                          \
+    ASSERT_UNIQUE_TEST_NAME(INTERNAL_TEST_CASE_)();                            \
+    return ::Assert::Nothing{};                                                \
+  };                                                                           \
+  void ASSERT_UNIQUE_TEST_NAME(INTERNAL_TEST_CASE_)()
+
 } // namespace Assert
 
-#endif // ASSERT_HPP_
+#endif // ASSERT_ASSERT_ASSERT_HPP_

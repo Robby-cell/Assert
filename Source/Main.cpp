@@ -1,6 +1,8 @@
 #include "Assert/Assert.hpp"
 #include "Assert/Context.hpp"
 
+TEST_CAST("Foo bar") { ASSERT(2 > 3); }
+
 auto main() -> int {
   int x;
   x = 3;
