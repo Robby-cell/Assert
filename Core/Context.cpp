@@ -14,6 +14,8 @@ auto Context::DisplayInfo() const -> void {
 
   for (std::size_t i = 0; i < tests_.size(); ++i) {
     const auto& test = tests_.at(i);
+    std::cerr << test.Name() << ": " << test.Passed() << ", " << test.Failed()
+              << '\n';
     if (!test.Failed()) {
       ++test_pass;
     }
@@ -35,13 +37,14 @@ auto Context::DisplayInfo() const -> void {
     std::cerr << "Passed " << test_pass << " tests and failed " << test_fail
               << '\n';
   }
+  std::cerr << '\t' << passed << " assertions passed\n\t" << failed
+            << " assertions failed\n";
 
   std::cerr << '\n';
 
   if (global_assertions_.Failed()) {
-    std::cerr << "Global assertions (" << global_assertions_.TestCount()
-              << "):\n\t" << global_assertions_.Passed() << " passed\n\t"
-              << global_assertions_.Failed() << " failed\n";
+    std::cerr << "Global assertions:\n\t" << global_assertions_.Passed()
+              << " passed\n\t" << global_assertions_.Failed() << " failed\n";
   } else if (global_assertions_.Passed()) {
     std::cerr << "All " << global_assertions_.Passed()
               << " global assertions passed\n";

@@ -21,11 +21,17 @@ public:
   auto PopSection() -> void;
   auto CurrentSection() const -> std::string;
 
-  constexpr auto AddTest() -> decltype(auto) {
-    tests_.emplace_back();
+  constexpr auto AddTest(const char* test_name) -> decltype(auto) {
+    tests_.emplace_back(test_name);
     current_test_ = tests_.size() - 1;
   }
-  constexpr auto LeaveTest() { current_test_ = NotInTest; }
+  constexpr auto LeaveTest() {
+    if (current_test_ == 0) {
+      current_test_ = NotInTest;
+    } else {
+      --current_test_;
+    }
+  }
 
   constexpr auto AddPass() noexcept {
     if (current_test_ != NotInTest) {
@@ -50,7 +56,7 @@ private:
 
   std::vector<std::string> section_;
   std::vector<TestResult> tests_;
-  TestResult global_assertions_;
+  TestResult global_assertions_{"Anonymous"};
   std::uint32_t current_test_ = NotInTest;
 };
 

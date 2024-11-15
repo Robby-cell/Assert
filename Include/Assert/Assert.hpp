@@ -103,7 +103,7 @@ template <typename Type> struct Expr<Type> {
 public:
   explicit Expr(const Type& value) : value_(value) {}
 
-  auto Validate() const noexcept {}
+  auto Validate() const;
 
   auto Eval() const noexcept -> const Type& { return ExprEval(value_); }
 
@@ -114,6 +114,15 @@ public:
 private:
   Type value_;
 };
+
+template <typename Type> inline auto Expr<Type>::Validate() const {}
+template <> inline auto Expr<bool>::Validate() const {
+  if (!value_) {
+    std::stringstream ss;
+    ss << "Assertion Failure: Expected " << (*this);
+    throw AssertionFailure(ss.str());
+  }
+}
 
 template <typename Type, typename Other> struct Expr<Type, Other, Eq> {
 public:
@@ -373,13 +382,17 @@ struct Nothing {
 #define CAT0(FIRST, SECOND) FIRST%:%:SECOND
 #define CAT(FIRST, SECOND) CAT0(FIRST, SECOND)
 #define ASSERT_UNIQUE_TEST_NAME(TEST_NAME) CAT(TEST_NAME, __LINE__)
-#define TEST_CAST(NAME)                                                        \
+#define TEST_CASE(NAME)                                                        \
   static void ASSERT_UNIQUE_TEST_NAME(INTERNAL_TEST_CASE_)();                  \
-  static auto CAT(VAR, ASSERT_UNIQUE_TEST_NAME(INTERNAL_TEST_CASE_)) = []() {  \
-    ::Assert::GetContext().AddTest();                                          \
-    ASSERT_UNIQUE_TEST_NAME(INTERNAL_TEST_CASE_)();                            \
-    return ::Assert::Nothing{};                                                \
+  struct CAT(STRUCT, ASSERT_UNIQUE_TEST_NAME(INTERNAL_TEST_STRUCT_)) {         \
+    CAT(STRUCT, ASSERT_UNIQUE_TEST_NAME(INTERNAL_TEST_STRUCT_))() {            \
+      ::Assert::GetContext().AddTest(NAME);                                    \
+      ASSERT_UNIQUE_TEST_NAME(INTERNAL_TEST_CASE_);                            \
+      ::Assert::GetContext().LeaveTest();                                      \
+    }                                                                          \
   };                                                                           \
+  static CAT(STRUCT, ASSERT_UNIQUE_TEST_NAME(INTERNAL_TEST_STRUCT_))           \
+      CAT(VAR, ASSERT_UNIQUE_TEST_NAME(INTERNAL_STATIC_TEST_STRUCT_)) = {};    \
   void ASSERT_UNIQUE_TEST_NAME(INTERNAL_TEST_CASE_)()
 
 } // namespace Assert
