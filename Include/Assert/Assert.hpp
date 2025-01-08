@@ -8,6 +8,7 @@
 #include <sstream>
 #include <stdexcept>
 #include <string>
+#include <tuple>
 
 namespace Assert {
 
@@ -387,7 +388,7 @@ struct Nothing {
   struct CAT(STRUCT, ASSERT_UNIQUE_TEST_NAME(INTERNAL_TEST_STRUCT_)) {         \
     CAT(STRUCT, ASSERT_UNIQUE_TEST_NAME(INTERNAL_TEST_STRUCT_))() {            \
       ::Assert::GetContext().AddTest(NAME);                                    \
-      ASSERT_UNIQUE_TEST_NAME(INTERNAL_TEST_CASE_);                            \
+      ASSERT_UNIQUE_TEST_NAME(INTERNAL_TEST_CASE_)();                          \
       ::Assert::GetContext().LeaveTest();                                      \
     }                                                                          \
   };                                                                           \
@@ -396,5 +397,13 @@ struct Nothing {
   void ASSERT_UNIQUE_TEST_NAME(INTERNAL_TEST_CASE_)()
 
 } // namespace Assert
+
+#ifndef ASSERT_NO_MAIN
+auto main(int argc, char** argv) -> int { // NOLINT
+  std::ignore = argc;
+  std::ignore = argv;
+  ::Assert::GetContext().DisplayInfo();
+}
+#endif
 
 #endif // ASSERT_ASSERT_ASSERT_HPP_

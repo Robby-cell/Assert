@@ -1,25 +1,28 @@
 #include "Assert/Assert.hpp"
-#include "Assert/Context.hpp"
 
 TEST_CASE("Foo bar") {
   ASSERT(2 > 3);
   ASSERT(false);
 }
+
 TEST_CASE("Some test") {
   SECTION("test2 (section)") { ASSERT(true); };
-  ASSERT(false);
+  ASSERT(true);
 }
 
-auto main() -> int {
-  int x;
-  x = 3;
-  ASSERT(x == 2);
-
-  SECTION("Foo") {
-    x = 42;
-    ASSERT(x > 10);
-    SECTION("Bar") { ASSERT(x < 20); };
+TEST_CASE("Another test case") {
+  SECTION("Another section") {
+    auto v = Assert::Expr<>{} * 3 < 1;
+    std::cout << v;
+    std::cout << '\n' << v.Eval();
+    try {
+      v.Validate();
+    } catch (...) {
+      std::cout << "\nInvalid\n";
+    }
+    ASSERT(3 < 1);
+    ASSERT(10 == 3);
   };
-  // VARINTERNAL_STATIC_TEST_STRUCT_4 = {};
-  Assert::GetContext().DisplayInfo();
 }
+
+TEST_CASE("No asserts") {}
