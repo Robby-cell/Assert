@@ -1,4 +1,4 @@
-#include "Assert/AssertMain.hpp"
+#include "Assert/Assert.hpp"
 
 TEST_CASE("Foo bar") {
   ASSERT(2 > 3);

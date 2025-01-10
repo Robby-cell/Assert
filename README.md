@@ -5,13 +5,13 @@
 Add it in CMAKE
 
 ```cmake
-target_link_libraries(main PRIVATE Assert::Assert)
+target_link_libraries(main PRIVATE Assert::Main)
 ```
 
 Then use it
 
 ```cpp
-#include "Assert/AssertMain.hpp"
+#include "Assert/Assert.hpp"
 
 TEST_CASE("Some test name") {
     SECTION("A section in the test") {
