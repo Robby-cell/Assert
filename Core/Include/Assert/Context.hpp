@@ -1,7 +1,6 @@
 #ifndef ASSERT_ASSERT_CONTEXT_HPP
 #define ASSERT_ASSERT_CONTEXT_HPP
 
-#include "Assert/TestResult.hpp"
 #include "TestResult.hpp"
 
 #include <cstdint>
@@ -10,10 +9,6 @@
 
 namespace Assert {
 
-class Context;
-
-auto GetContext() noexcept -> Context&;
-
 class Context {
 public:
   auto DisplayInfo() const -> void;
@@ -21,17 +16,8 @@ public:
   auto PopSection() -> void;
   auto CurrentSection() const -> std::string;
 
-  constexpr auto AddTest(const char* test_name) -> decltype(auto) {
-    tests_.emplace_back(test_name);
-    current_test_ = tests_.size() - 1;
-  }
-  constexpr auto LeaveTest() {
-    if (current_test_ == 0) {
-      current_test_ = NotInTest;
-    } else {
-      --current_test_;
-    }
-  }
+  auto AddTest(const char* test_name) -> void ;
+  auto LeaveTest() -> void;
 
   constexpr auto AddPass() noexcept {
     if (current_test_ != NotInTest) {
@@ -48,9 +34,8 @@ public:
     }
   }
 
-private:
   Context() = default;
-  friend auto GetContext() noexcept -> Context&;
+private:
 
   static constexpr std::uint32_t NotInTest = -1;
 

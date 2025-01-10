@@ -3,10 +3,10 @@
 
 #include "Context.hpp" // IWYU pragma: export
 #include "Expr.hpp"    // IWYU pragma: export
+#include "Fwd.hpp"
 
 #include <iostream> // IWYU pragma: export
 #include <string>
-#include <tuple>
 
 namespace Assert {
 
@@ -73,13 +73,5 @@ struct Nothing {
   void ASSERT_UNIQUE_TEST_NAME(INTERNAL_TEST_CASE_)()
 
 } // namespace Assert
-
-#ifndef ASSERT_NO_MAIN
-auto main(int argc, char** argv) -> int { // NOLINT
-  std::ignore = argc;
-  std::ignore = argv;
-  ::Assert::GetContext().DisplayInfo();
-}
-#endif
 
 #endif // ASSERT_ASSERT_ASSERT_HPP

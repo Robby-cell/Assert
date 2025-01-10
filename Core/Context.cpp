@@ -69,9 +69,17 @@ auto Context::CurrentSection() const -> std::string {
   return ss.str();
 }
 
-auto GetContext() noexcept -> Context& {
-  static Context context;
-  return context;
+auto Context::AddTest(const char* test_name) -> void {
+ tests_.emplace_back(test_name);
+ current_test_ = tests_.size() - 1;
+}
+
+auto Context::LeaveTest() -> void {
+ if (current_test_ == 0) {
+   current_test_ = NotInTest;
+ } else {
+   --current_test_;
+ }
 }
 
 } // namespace Assert

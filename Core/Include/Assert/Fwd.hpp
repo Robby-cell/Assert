@@ -10,6 +10,9 @@ public:
   explicit AssertionFailure(const What& what) noexcept
       : std::runtime_error(what) {}
 };
+
+class Context;
+auto GetContext() -> Context&;
 } // namespace Assert
 
 #endif // ASSERT_ASSERT_FWD_HPP
