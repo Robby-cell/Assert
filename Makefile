@@ -1,5 +1,5 @@
 BUILD_DIR = build
-BIN = ${BUILD_DIR}/Main
+BIN = ${BUILD_DIR}/bin/Main
 
 export VCPKG_ROOT
 

@@ -1,6 +1,7 @@
 #ifndef ASSERT_ASSERT_CONTEXT_HPP
 #define ASSERT_ASSERT_CONTEXT_HPP
 
+#include "Assert/Fwd.hpp"
 #include "TestResult.hpp"
 
 #include <cstdint>
@@ -9,6 +10,8 @@
 
 namespace Assert {
 
+class Context;
+
 class Context {
 public:
   auto DisplayInfo() const -> void;
@@ -16,7 +19,7 @@ public:
   auto PopSection() -> void;
   auto CurrentSection() const -> std::string;
 
-  auto AddTest(const char* test_name) -> void ;
+  auto AddTest(const char* test_name) -> void;
   auto LeaveTest() -> void;
 
   constexpr auto AddPass() noexcept {
@@ -34,8 +37,9 @@ public:
     }
   }
 
-  Context() = default;
 private:
+  Context() = default;
+  friend auto GetContext() -> Context&;
 
   static constexpr std::uint32_t NotInTest = -1;
 
