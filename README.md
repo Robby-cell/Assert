@@ -1,7 +1,26 @@
-# CXX_Template
+# Assert
 
-## What is it for?
-This is just for my DSA class. A template so I can start each week with a fresh project and keep things organized.
+## A simple package for testing
 
-## Who is it for?
-People writing trivial C++, like those implementing a linked list, then moving on to something new next week, or next lecture.
+Add it in CMAKE
+
+```cmake
+target_link_libraries(main PRIVATE Assert::Assert)
+```
+
+Then use it
+
+```cpp
+#include "Assert/AssertMain.hpp"
+
+TEST_CASE("Some test name") {
+    SECTION("A section in the test") {
+        auto x = 5;
+        PRECONDITION(x == 5);
+        ++x;
+        ASSERT(x == 6);
+    };
+}
+
+// No main needed. just add your tests.
+```
