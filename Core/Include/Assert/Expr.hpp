@@ -3,21 +3,22 @@
 
 #include "Fwd.hpp"
 
+#include <iostream>
 #include <ostream>
 #include <sstream>
 #include <utility>
 
 namespace Assert {
-struct Add;
-struct Sub;
-struct Mul;
-struct Div;
-struct Eq;
-struct NotEq;
-struct Greater;
-struct Less;
-struct GreaterEq;
-struct LessEq;
+struct Add {};
+struct Sub {};
+struct Mul {};
+struct Div {};
+struct Eq {};
+struct NotEq {};
+struct Greater {};
+struct Less {};
+struct GreaterEq {};
+struct LessEq {};
 
 template <class...> struct Expr;
 
@@ -65,8 +66,7 @@ auto operator<=(Expr<Ts...>&& expr, const Type& value) {
 template <typename Type> auto ExprEval(const Type& value) -> const Type& {
   return value;
 }
-template <typename... Ts>
-auto ExprEval(const Expr<Ts...>& expr) -> decltype(expr.Eval()) {
+template <typename... Ts> auto ExprEval(const Expr<Ts...>& expr) {
   return expr.Eval();
 }
 template <typename Type> auto ExprValidate(const Type& value) noexcept {}
@@ -94,7 +94,7 @@ public:
 
   auto Validate() const;
 
-  auto Eval() const noexcept -> const Type& { return ExprEval(value_); }
+  auto Eval() const noexcept -> const Type& { return value_; }
 
   friend auto operator<<(std::ostream& os, const Expr& expr) -> std::ostream& {
     return os << expr.value_;
@@ -129,57 +129,57 @@ template <> constexpr auto GetSymbol<Div>() { return "/"; }
 template <typename Op, typename Lhs, typename Rhs> struct ExprEvaluateHelper;
 
 template <typename Lhs, typename Rhs> struct ExprEvaluateHelper<Eq, Lhs, Rhs> {
-  static constexpr auto Evaluate(Lhs&& lhs, Rhs&& rhs) -> decltype(auto) {
+  static constexpr auto Evaluate(Lhs&& lhs, Rhs&& rhs) {
     return ExprEval(lhs) == ExprEval(rhs);
   }
 };
 template <typename Lhs, typename Rhs>
 struct ExprEvaluateHelper<NotEq, Lhs, Rhs> {
-  static constexpr auto Evaluate(Lhs&& lhs, Rhs&& rhs) -> decltype(auto) {
+  static constexpr auto Evaluate(Lhs&& lhs, Rhs&& rhs) {
     return ExprEval(lhs) != ExprEval(rhs);
   }
 };
 template <typename Lhs, typename Rhs>
 struct ExprEvaluateHelper<Greater, Lhs, Rhs> {
-  static constexpr auto Evaluate(Lhs&& lhs, Rhs&& rhs) -> decltype(auto) {
+  static constexpr auto Evaluate(Lhs&& lhs, Rhs&& rhs) {
     return ExprEval(lhs) > ExprEval(rhs);
   }
 };
 template <typename Lhs, typename Rhs>
 struct ExprEvaluateHelper<Less, Lhs, Rhs> {
-  static constexpr auto Evaluate(Lhs&& lhs, Rhs&& rhs) -> decltype(auto) {
+  static constexpr auto Evaluate(Lhs&& lhs, Rhs&& rhs) {
     return ExprEval(lhs) < ExprEval(rhs);
   }
 };
 template <typename Lhs, typename Rhs>
 struct ExprEvaluateHelper<GreaterEq, Lhs, Rhs> {
-  static constexpr auto Evaluate(Lhs&& lhs, Rhs&& rhs) -> decltype(auto) {
+  static constexpr auto Evaluate(Lhs&& lhs, Rhs&& rhs) {
     return ExprEval(lhs) >= ExprEval(rhs);
   }
 };
 template <typename Lhs, typename Rhs>
 struct ExprEvaluateHelper<LessEq, Lhs, Rhs> {
-  static constexpr auto Evaluate(Lhs&& lhs, Rhs&& rhs) -> decltype(auto) {
+  static constexpr auto Evaluate(Lhs&& lhs, Rhs&& rhs) {
     return ExprEval(lhs) <= ExprEval(rhs);
   }
 };
 template <typename Lhs, typename Rhs> struct ExprEvaluateHelper<Add, Lhs, Rhs> {
-  static constexpr auto Evaluate(Lhs&& lhs, Rhs&& rhs) -> decltype(auto) {
+  static constexpr auto Evaluate(Lhs&& lhs, Rhs&& rhs) {
     return ExprEval(lhs) + ExprEval(rhs);
   }
 };
 template <typename Lhs, typename Rhs> struct ExprEvaluateHelper<Sub, Lhs, Rhs> {
-  static constexpr auto Evaluate(Lhs&& lhs, Rhs&& rhs) -> decltype(auto) {
+  static constexpr auto Evaluate(Lhs&& lhs, Rhs&& rhs) {
     return ExprEval(lhs) - ExprEval(rhs);
   }
 };
 template <typename Lhs, typename Rhs> struct ExprEvaluateHelper<Mul, Lhs, Rhs> {
-  static constexpr auto Evaluate(Lhs&& lhs, Rhs&& rhs) -> decltype(auto) {
+  static constexpr auto Evaluate(Lhs&& lhs, Rhs&& rhs) {
     return ExprEval(lhs) * ExprEval(rhs);
   }
 };
 template <typename Lhs, typename Rhs> struct ExprEvaluateHelper<Div, Lhs, Rhs> {
-  static constexpr auto Evaluate(Lhs&& lhs, Rhs&& rhs) -> decltype(auto) {
+  static constexpr auto Evaluate(Lhs&& lhs, Rhs&& rhs) {
     return ExprEval(lhs) / ExprEval(rhs);
   }
 };
@@ -205,13 +205,13 @@ public:
     }
   }
 
-  auto Eval() const noexcept -> bool {
+  auto Eval() const noexcept {
     return Detail::ExprPerformOp<Op>(value_, other_);
   }
 
   friend auto operator<<(std::ostream& os, const Expr& expr) -> std::ostream& {
-    return os << ExprEval(expr.value_) << ' ' << Detail::GetSymbol<Op>() << ' '
-              << ExprEval(expr.other_);
+    return os << expr.value_ << ' ' << Detail::GetSymbol<Op>() << ' '
+              << expr.other_;
   }
 
 private:

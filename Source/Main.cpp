@@ -1,20 +1,9 @@
 #include "Assert/Assert.hpp"
-
-TEST_CASE("Foo bar") {
-  ASSERT(2 > 3);
-  ASSERT(false);
+TEST_CASE("Integer Addition Test") {
+  int a = 5;
+  int b = 10;
+  ASSERT(a + b == 15); // Assertion that should pass
+  ASSERT(a + b != 20); // Another assertion that should pass
+  ASSERT(a * b == 50); // Assertion that should pass
+  ASSERT(a - b > 0);   // Assertion that should FAIL
 }
-
-TEST_CASE("Some test") {
-  SECTION("test2 (section)") { ASSERT(true); };
-  ASSERT(true);
-}
-
-TEST_CASE("Another test case") {
-  SECTION("Another section") {
-    ASSERT(3 < 1);
-    ASSERT(10 == 3);
-  };
-}
-
-TEST_CASE("No asserts") {}
